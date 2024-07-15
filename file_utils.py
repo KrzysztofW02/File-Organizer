@@ -2,6 +2,7 @@ import os
 import shutil
 from PIL import Image
 from PyPDF2 import PdfFileReader
+from PyQt5.QtWidgets import QMessageBox
 import mimetypes
 import zipfile
 import tarfile
@@ -19,6 +20,7 @@ FILE_TYPE_FOLDERS = {
     '.pdf': 'pdfs',
     '.doc': 'documents',
     '.docx': 'documents',
+    '.odt': 'documents',
     '.ppt': 'presentations',
     '.pptx': 'presentations',
     '.mp3': 'audio',
@@ -49,14 +51,11 @@ FILE_TYPE_FOLDERS = {
     '.xlsx': 'excel',
     '.csv': 'excel',
     '.xlsm': 'excel',
-    '.doc': 'word',
-    '.docx': 'word',
-    '.odt': 'word',
-    '.ppt': 'powerpoint',
-    '.pptx': 'powerpoint',
-    '.pps': 'powerpoint',
-    '.ppsx': 'powerpoint',
-    '.odp': 'powerpoint',
+    '.ppt': 'presentations',
+    '.pptx': 'presentations',
+    '.pps': 'presentations',
+    '.ppsx': 'presentations',
+    '.odp': 'presentations',
 }
 
 def get_folder_for_file(file_path):
@@ -115,12 +114,25 @@ def is_archive(file_path):
     except:
         return False
 
-
 def move_file_to_folder(file_path, folder_name):
     destination_folder = os.path.join(os.getcwd(), folder_name)
     if not os.path.exists(destination_folder):
         os.makedirs(destination_folder)
-    shutil.move(file_path, destination_folder)
+    
+    file_name = os.path.basename(file_path)
+    destination_file_path = os.path.join(destination_folder, file_name)
+    
+    if os.path.exists(destination_file_path):
+        reply = QMessageBox.question(None, 'File Exists', f'A file named {file_name} already exists. Do you want to replace it?', QMessageBox.Yes | QMessageBox.No)
+        if reply == QMessageBox.No:
+            return False
+    
+    try:
+        shutil.move(file_path, destination_file_path)
+        return True
+    except Exception as e:
+        print(f"Error moving file: {e}")
+        return False
 
 def is_file_valid(file_path):
     folder_name = get_folder_for_file(file_path)
@@ -135,5 +147,17 @@ def is_file_valid(file_path):
     elif folder_name == 'videos' and is_video(file_path):
         return True
     elif folder_name == 'archives' and is_archive(file_path):
+        return True
+    elif folder_name == 'documents':
+        return True
+    elif folder_name == 'excel':
+        return True
+    elif folder_name == 'presentations':
+        return True
+    elif folder_name == 'web':
+        return True
+    elif folder_name == 'code':
+        return True
+    elif folder_name == 'executables':
         return True
     return False
