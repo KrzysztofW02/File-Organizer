@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QLabel, QMessageBox
 from PyQt5.QtCore import Qt
-from file_utils import get_folder_for_file, move_file_to_folder
+from file_utils import get_folder_for_file, move_file_to_folder, is_file_valid
 
 class FileDropLabel(QLabel):
     def __init__(self, parent=None):
@@ -20,8 +20,11 @@ class FileDropLabel(QLabel):
                 file_path = url.toLocalFile()
                 folder_name = get_folder_for_file(file_path)
                 if folder_name:
-                    move_file_to_folder(file_path, folder_name)
-                    QMessageBox.information(self, 'File Detected', f'File moved to {folder_name} folder')
+                    if is_file_valid(file_path):
+                        move_file_to_folder(file_path, folder_name)
+                        QMessageBox.information(self, 'File Detected', f'File moved to {folder_name} folder')
+                    else:
+                        QMessageBox.warning(self, 'File Damaged', 'The file is damaged and cannot be moved.')
                 else:
                     QMessageBox.warning(self, 'File Not Supported', 'Sorry, this file type is not supported.')
                 break

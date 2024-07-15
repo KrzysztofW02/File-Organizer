@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QFileDialog, QMessageBox, QVBoxLayout, QWidget
-from file_utils import get_folder_for_file, move_file_to_folder
+from file_utils import get_folder_for_file, move_file_to_folder, is_file_valid
 from file_drop import FileDropLabel
 
 class MainWindow(QMainWindow):
@@ -30,7 +30,10 @@ class MainWindow(QMainWindow):
         if file_path:
             folder_name = get_folder_for_file(file_path)
             if folder_name:
-                move_file_to_folder(file_path, folder_name)
-                QMessageBox.information(self, 'File Detected', f'File moved to {folder_name} folder')
+                if is_file_valid(file_path):
+                    move_file_to_folder(file_path, folder_name)
+                    QMessageBox.information(self, 'File Detected', f'File moved to {folder_name} folder')
+                else:
+                    QMessageBox.warning(self, 'File Damaged', 'The file is damaged and cannot be moved.')
             else:
                 QMessageBox.warning(self, 'File Not Supported', 'Sorry, this file type is not supported.')
