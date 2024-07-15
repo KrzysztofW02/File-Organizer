@@ -1,6 +1,5 @@
-import os
-import shutil
-from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton, QFileDialog, QMessageBox, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QFileDialog, QMessageBox, QVBoxLayout, QWidget
+from file_utils import get_folder_for_file, move_file_to_folder
 from file_drop import FileDropLabel
 
 class MainWindow(QMainWindow):
@@ -27,19 +26,11 @@ class MainWindow(QMainWindow):
     def open_file_dialog(self):
         options = QFileDialog.Options()
         options |= QFileDialog.ReadOnly
-        file_path, _ = QFileDialog.getOpenFileName(self, "Load your file", "", "All Files (*);;Image Files (*.png *.jpg *.jpeg *.gif *.bmp)", options=options)
+        file_path, _ = QFileDialog.getOpenFileName(self, "Load your file", "", "All Files (*);;", options=options)
         if file_path:
-            if self.is_image(file_path):
-                self.move_to_images_folder(file_path)
-                QMessageBox.information(self, 'File Detected', f'File moved sucesfully')
+            folder_name = get_folder_for_file(file_path)
+            if folder_name:
+                move_file_to_folder(file_path, folder_name)
+                QMessageBox.information(self, 'File Detected', f'File moved to {folder_name} folder')
             else:
-                QMessageBox.warning(self, 'File Not Supported', 'Sorry we cannot help you with that type of file')
-
-    def is_image(self, file_path):
-        return file_path.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))
-
-    def move_to_images_folder(self, file_path):
-        images_folder = os.path.join(os.getcwd(), 'images')
-        if not os.path.exists(images_folder):
-            os.makedirs(images_folder)
-        shutil.move(file_path, images_folder)
+                QMessageBox.warning(self, 'File Not Supported', 'Sorry, this file type is not supported.')

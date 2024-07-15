@@ -1,7 +1,6 @@
-import os
-import shutil
 from PyQt5.QtWidgets import QLabel, QMessageBox
 from PyQt5.QtCore import Qt
+from file_utils import get_folder_for_file, move_file_to_folder
 
 class FileDropLabel(QLabel):
     def __init__(self, parent=None):
@@ -19,18 +18,10 @@ class FileDropLabel(QLabel):
         if event.mimeData().hasUrls():
             for url in event.mimeData().urls():
                 file_path = url.toLocalFile()
-                if self.is_image(file_path):
-                    self.move_to_images_folder(file_path)
-                    QMessageBox.information(self, 'File Detected', f'File moved sucesfully')
+                folder_name = get_folder_for_file(file_path)
+                if folder_name:
+                    move_file_to_folder(file_path, folder_name)
+                    QMessageBox.information(self, 'File Detected', f'File moved to {folder_name} folder')
                 else:
-                    QMessageBox.warning(self, 'File Not Supported', 'Sorry we cannot help you with that type of file')
+                    QMessageBox.warning(self, 'File Not Supported', 'Sorry, this file type is not supported.')
                 break
-
-    def is_image(self, file_path):
-        return file_path.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))
-
-    def move_to_images_folder(self, file_path):
-        images_folder = os.path.join(os.getcwd(), 'images')
-        if not os.path.exists(images_folder):
-            os.makedirs(images_folder)
-        shutil.move(file_path, images_folder)
