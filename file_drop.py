@@ -22,7 +22,7 @@ class FileDropLabel(QLabel):
                 if folder_name:
                     if is_file_valid(file_path):
                         if move_file_to_folder(file_path, folder_name):
-                            QMessageBox.information(self, 'File Moved', f'File {file_path} moved to {folder_name} folder')
+                            QMessageBox.information(self, 'File Moved', f'File moved to {folder_name} folder')
                         else:
                             QMessageBox.warning(self, 'File Exists', f'A file with the name {file_path} already exists and was not replaced.')
                     else:
